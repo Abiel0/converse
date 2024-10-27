@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import shutil
 
 app = Flask(__name__, static_folder='.')
+CORS(app)
 
 @app.route('/')
 def serve_index():
@@ -78,4 +79,4 @@ def predict_and_save_audio(input_file, output_dir='audio_outputs'):
     return output_path, text_response
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
