@@ -1,18 +1,26 @@
 from flask import Flask, request, send_from_directory, jsonify
+from flask_cors import CORS
 from gradio_client import Client, handle_file
 import os
 from werkzeug.utils import secure_filename
 import shutil
 
 app = Flask(__name__, static_folder='.')
-CORS(app)
+CORS(app)  # Enable CORS for all routes
 
 @app.route('/')
 def serve_index():
     return send_from_directory('.', 'index.html')
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST', 'OPTIONS'])  # Added OPTIONS method
 def upload_file():
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file provided'}), 400
     
